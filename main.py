@@ -1,52 +1,115 @@
 #Szükséges csomagok importálása
-#%%
-
+import tensorflow as tf
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-import tensorflow as tf
 
-#Dataset betöltése és trainingje
-(x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
+num_model = tf.keras.models.load_model('digits_reader.model')
 
-#Adatok normalizálása
-x_train = tf.keras.utils.normalize(x_train, axis=1)
-x_test = tf.keras.utils.normalize(x_test, axis=1)
+#Változók a statisztikához
+ok = 0
+notok = 0
+allnumber = 0
+thicknums = 0
+nastynums = 0
+randnums = 0
+finenums = 0
 
-#Modell készítése, rétegek hozzáadása
-model = tf.keras.models.Sequential()
-model.add(tf.keras.layers.Flatten(input_shape = (28,28))) #bementi réteg
-model.add(tf.keras.layers.Dense(units=128, activation= tf.nn.relu))
-model.add(tf.keras.layers.Dense(units=128, activation= tf.nn.relu))
-model.add(tf.keras.layers.Dense(units=10, activation= tf.nn.softmax)) #kimeneti réteg
-
-#Modell lefordítása, tanítása és mentése
-model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-model.fit(x_train, y_train, batch_size = 32, epochs=5)
-loss, accuracy = model.evaluate(x_test, y_test)
-
-#Modell mentése
-model.save('digits.mod')
-
-#Képek beolvasása a teszthez
-for x in range(0, 10):
-    readimg = cv2.imread(f'TestNumbers/{x}_big.png')[:,:,0]
-    readimg = np.invert(np.array([readimg]))
-    prediction = model.predict(readimg)
-    print(f'Number: {x}, The prediction of the sotfware is: {np.argmax(prediction)}')
+#Teszt
+allnumber += 10
+for img in range(0, 10):
+    readimg = cv2.imread(f'TestNumbers/{img}_big.png')[:,:,0]
+    readimg = np.array([readimg])
+    first_idx = readimg[0,0,0]
+    for x in range(0,1):
+        for y in range(0,28):
+            for z in range(0,28):
+                if readimg[x,y,z] == first_idx:
+                    readimg[x,y,z] = 0
+                else:
+                    readimg[x,y,z] = 255
+    prediction = num_model.predict(readimg)
+    print(f'Number: {img}, The prediction of the sotfware is: {np.argmax(prediction)}')
+    if img == np.argmax(prediction):
+        ok += 1
+        thicknums += 1
+    else:
+        notok += 1
     plt.imshow(readimg[0], cmap=plt.cm.binary)
     plt.show()
 
+allnumber += 10
+for img in range(0, 10):
+    readimg = cv2.imread(f'TestNumbers/{img}.png')[:,:,0]
+    readimg = np.array([readimg])
+    first_idx = readimg[0,0,0]
+    for x in range(0,1):
+        for y in range(0,28):
+            for z in range(0,28):
+                if readimg[x,y,z] == first_idx:
+                    readimg[x,y,z] = 0
+                else:
+                    readimg[x,y,z] = 255
+    prediction = num_model.predict(readimg)
+    print(f'Number: {img}, The prediction of the sotfware is: {np.argmax(prediction)}')
+    if img == np.argmax(prediction):
+        ok += 1
+        nastynums += 1
+    else:
+        notok += 1
+    plt.imshow(readimg[0], cmap=plt.cm.binary)
+    plt.show()
 
-for x in range(0, 10):
-    readimg = cv2.imread(f'TestNumbers/{x}.png')[:,:,0]
-    readimg = np.invert(np.array([readimg]))
-    prediction = model.predict(readimg)
-    print(f'Number: {x}, The prediction of the sotfware is: {np.argmax(prediction)}')
+allnumber += 10
+for img in range(0, 10):
+    readimg = cv2.imread(f'TestNumbers/1{img}.png')[:,:,0]
+    readimg = np.array([readimg])
+    first_idx = readimg[0,0,0]
+    for x in range(0,1):
+        for y in range(0,28):
+            for z in range(0,28):
+                if readimg[x,y,z] == first_idx:
+                    readimg[x,y,z] = 0
+                else:
+                    readimg[x,y,z] = 255
+    prediction = num_model.predict(readimg)
+    print(f'Number: {img}, The prediction of the sotfware is: {np.argmax(prediction)}')
+    if img == np.argmax(prediction):
+        ok += 1
+        randnums += 1
+    else:
+        notok += 1
+    plt.imshow(readimg[0], cmap=plt.cm.binary)
+    plt.show()
 
-for x in range(0, 10):
-    readimg = cv2.imread(f'TestNumbers/1{x}.png')[:,:,0]
-    readimg = np.invert(np.array([readimg]))
-    prediction = model.predict(readimg)
-    print(f'Number: {x}, The prediction of the sotfware is: {np.argmax(prediction)}')
+allnumber += 10
+for img in range(0, 10):
+    readimg = cv2.imread(f'TestNumbers/{img}_c.png')[:,:,0]
+    readimg = np.array([readimg])
+    first_idx = readimg[0,0,0]
+    for x in range(0,1):
+        for y in range(0,28):
+            for z in range(0,28):
+                if readimg[x,y,z] == first_idx:
+                    readimg[x,y,z] = 0
+                else:
+                    readimg[x,y,z] = 255
+    prediction = num_model.predict(readimg)
+    print(f'Number: {img}, The prediction of the sotfware is: {np.argmax(prediction)}')
+    if img == np.argmax(prediction):
+        ok += 1
+        finenums += 1
+    else:
+        notok += 1
+    plt.imshow(readimg[0], cmap=plt.cm.binary)
+    plt.show()
+
+print('Összesen:')
+print(f'Összes tipp: {allnumber}')
+print(f'Jó tippek: {ok}')
+print(f'Rossz tippek: {notok}')
+print(f'Vastag írásmódú számok esetén: {thicknums}/10')
+print(f'Ronda írású számok esetén: {nastynums}/10')
+print(f'Hirtelen írásmódú számok esetén: {randnums}/10')
+print(f'Odafigyelt írásmódú és színes hátterű számok esetén: {finenums}/10')
 # %%
