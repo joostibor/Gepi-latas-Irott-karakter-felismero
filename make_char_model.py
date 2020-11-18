@@ -1,48 +1,63 @@
-#Szükséges csomagok importálása
 #%%
-import tensorflow as tf
-import extra_keras_datasets as extkds
-import gzip
+#Szükséges csomagok importálása
 import numpy as np
-import struct
+import pandas as pd
+import cv2
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from keras.models import Sequential
+from keras import layers
+from keras.utils import np_utils
 
-#Dataset betöltése
-def read_idx(filename):
-    print('Processing data from %s.' % filename)
-    with gzip.open(filename, 'rb') as f:
-        z, dtype, dim = struct.unpack('>HBB', f.read(4))
-        shape = tuple(struct.unpack('>I', f.read(4))[0] for d in range(dim))
-        return np.frombuffer(f.read(), dtype=np.uint8).reshape(shape)
+#Beolvasott kép újraméterezése és forgatása
+WIDTH = 28
+HEIGHT = 28
+def rotate(image):
+    image = image.reshape([HEIGHT, WIDTH])
+    image = np.fliplr(image)
+    image = np.rot90(image)
+    return image
 
-def load_emnist():
-    train_images = 'train-images-idx3-ubyte.gz'
-    train_labels = 'train-labels-idx1-ubyte.gz'
-    test_images = 't10k-images-idx3-ubyte.gz'
-    test_labels = 't10k-labels-idx1-ubyte.gz'
+#Fájlok beolvasása
+train = pd.read_csv('emnist-balanced-train.csv')
+test = pd.read_csv('emnist-balanced-test.csv')
 
-    train_X = read_idx(train_images)
-    train_y = read_idx(train_labels)
-    test_X = read_idx(test_images)
-    test_y = read_idx(test_labels)
-    return (train_X, train_y, test_X, test_y)
+#Adatbetöltés
+x_train, y_train = train.iloc[:, 1:], train.iloc[:, 0]
+x_test, y_test = test.iloc[:, 1:], test.iloc[:, 0]
 
-x_train, y_train, x_test, y_test = load_emnist()
+#Felesleges pandas adatbázisok törlése
+del train
+del test
 
-#Adatok normalizálása
-x_train = tf.keras.utils.normalize(x_train, axis=1)
-x_test = tf.keras.utils.normalize(x_test, axis=1)
+#Normalizálás
+x_train = np.apply_along_axis(rotate, 1, x_train.values)
+x_test = np.apply_along_axis(rotate, 1, x_test.values)
+x_train = x_train.astype('float32') / 255
+x_test = x_test.astype('float32') / 255
 
-#Modell készítése, rétegek hozzáadása
-model = tf.keras.models.Sequential()
-model.add(tf.keras.layers.Flatten(input_shape = (28,28))) #bementi réteg
-model.add(tf.keras.layers.Dense(128, activation=tf.nn.relu))
-model.add(tf.keras.layers.Dense(128, activation=tf.nn.relu))
-model.add(tf.keras.layers.Dense(10, activation=tf.nn.softmax)) #kimeneti réteg
+#Train adatok alapján lehetőségek számának beállítása
+number_of_classes = y_train.nunique()
+y_train = np_utils.to_categorical(y_train, number_of_classes)
+y_test = np_utils.to_categorical(y_test, number_of_classes)
 
-#Modell lefordítása, tanítása és mentése
-model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-model.fit(x_train, y_train, epochs=5, validation_data=(x_test, y_test))
+#Újraméretezés
+x_train = x_train.reshape(-1, 28, 28, 1)
+x_test = x_test.reshape(-1, 28, 28, 1)
 
-#Modell mentése
+x_train, X_val, y_train, y_val = train_test_split(x_train, y_train, test_size= 0.10, random_state=88)
+
+#Modell létrehozása
+model = Sequential()
+model.add(layers.Conv2D(filters=6, kernel_size=(3, 3), activation='relu', input_shape=(28,28,1)))
+model.add(layers.AveragePooling2D())
+model.add(layers.Conv2D(filters=16, kernel_size=(3, 3), activation='relu'))
+model.add(layers.AveragePooling2D())
+model.add(layers.Flatten())
+model.add(layers.Dense(units=120, activation='relu'))
+model.add(layers.Dense(units=84, activation='relu'))
+model.add(layers.Dense(units=47, activation = 'softmax'))
+model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+model.fit(x_train, y_train, epochs=4, batch_size=16, verbose=1, validation_data=(X_val, y_val))
+
 model.save('char_reader.model')
-# %%
