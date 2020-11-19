@@ -80,3 +80,4 @@ txt.pack()
 
 program.title('Írott karakter felismerő')
 program.mainloop()
+# %%
