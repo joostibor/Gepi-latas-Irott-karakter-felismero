@@ -1,5 +1,4 @@
 #Szükséges csomagok importálása
-#%%
 import tensorflow as tf
 import cv2
 import numpy as np
@@ -175,4 +174,3 @@ print(f'Vastag írásmódú számok esetén: {thicknums}/10')
 print(f'Ronda írású számok esetén: {nastynums}/10')
 print(f'Hirtelen írásmódú számok esetén: {randnums}/10')
 print(f'Odafigyelt írásmódú és színes hátterű számok esetén: {finenums}/10')
-# %%

@@ -13,8 +13,8 @@ def rotate(image):
     return image
 
 #Fájlok beolvasása
-train = pd.read_csv('emnist-balanced-train.csv')
-test = pd.read_csv('emnist-balanced-test.csv')
+train = pd.read_csv('mnist_train.csv')
+test = pd.read_csv('mnist_test.csv')
 
 #Adatbetöltés
 x_train, y_train = train.iloc[:, 1:], train.iloc[:, 0]
@@ -48,11 +48,10 @@ model.add(tf.keras.layers.AveragePooling2D())
 model.add(tf.keras.layers.Conv2D(filters=16, kernel_size=(3, 3), activation=tf.nn.relu))
 model.add(tf.keras.layers.AveragePooling2D())
 model.add(tf.keras.layers.Flatten())
-model.add(tf.keras.layers.Dense(units=120, activation=tf.nn.relu))
-model.add(tf.keras.layers.Dense(units=84, activation=tf.nn.relu))
-model.add(tf.keras.layers.Dense(units=47, activation = tf.nn.softmax))
+model.add(tf.keras.layers.Dense(units=128, activation=tf.nn.relu))
+model.add(tf.keras.layers.Dense(units=128, activation=tf.nn.relu))
+model.add(tf.keras.layers.Dense(units=10, activation = tf.nn.softmax))
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-model.fit(x_train, y_train, epochs=10, batch_size=16, verbose=1, validation_data=(X_val, y_val))
+model.fit(x_train, y_train, epochs=4, batch_size=16, verbose=1, validation_data=(X_val, y_val))
 
-model.save('char_reader.model')
-# %%
+model.save('digit_reader_conv.model')
