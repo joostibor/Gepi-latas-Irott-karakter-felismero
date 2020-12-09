@@ -1,0 +1,11 @@
+./vscode
+./__pycache__
+./char_reader.model
+./dig_reader.model
+./digits_reader.model
+emnist-balanced-mapping.txt
+emnist-balanced-test.csv
+emnist-balanced-train.csv
+mnist_test.csv
+mnist_train.csv
+tmp.png
