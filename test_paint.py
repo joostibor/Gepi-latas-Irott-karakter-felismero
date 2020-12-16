@@ -2,7 +2,6 @@
 import tensorflow as tf
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
 
 num_model = tf.keras.models.load_model('digits_reader.model')
