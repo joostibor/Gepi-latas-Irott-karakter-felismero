@@ -3,6 +3,7 @@
 /char_reader.model
 /dig_reader.model
 /digits_reader.model
+/digit_reader_conv.model
 emnist-balanced-mapping.txt
 emnist-balanced-test.csv
 emnist-balanced-train.csv

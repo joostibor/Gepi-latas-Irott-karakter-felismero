@@ -55,4 +55,3 @@ model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accur
 model.fit(x_train, y_train, epochs=10, batch_size=16, verbose=1, validation_data=(X_val, y_val))
 
 model.save('char_reader.model')
-# %%

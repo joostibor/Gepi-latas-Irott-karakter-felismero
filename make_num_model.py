@@ -18,7 +18,7 @@ model.add(tf.keras.layers.Dense(10, activation=tf.nn.softmax)) #kimeneti réteg
 
 #Modell lefordítása, tanítása és mentése
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-model.fit(x_train, y_train, batch_size = 32, epochs=5)
+model.fit(x_train, y_train, batch_size = 16, epochs=5)
 
 #Modell mentése
 model.save('digits_reader.model')

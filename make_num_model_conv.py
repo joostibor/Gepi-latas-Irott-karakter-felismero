@@ -52,6 +52,6 @@ model.add(tf.keras.layers.Dense(units=128, activation=tf.nn.relu))
 model.add(tf.keras.layers.Dense(units=128, activation=tf.nn.relu))
 model.add(tf.keras.layers.Dense(units=10, activation = tf.nn.softmax))
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-model.fit(x_train, y_train, epochs=4, batch_size=16, verbose=1, validation_data=(X_val, y_val))
+model.fit(x_train, y_train, epochs=5, batch_size=16, verbose=1, validation_data=(X_val, y_val))
 
 model.save('digit_reader_conv.model')
